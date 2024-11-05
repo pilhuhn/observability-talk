@@ -26,7 +26,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class Brewery {
 
-    @WithSpan()
+//    @WithSpan()
     void brewTea(@SpanAttribute(value = "kind-of-tea") String kind) throws InterruptedException {
         if (Math.random()*100 < 30) {
             throw new NotEnoughDilithiumException(kind);

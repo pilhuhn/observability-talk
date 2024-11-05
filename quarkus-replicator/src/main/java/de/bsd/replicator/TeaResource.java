@@ -10,11 +10,11 @@ import java.util.Locale;
 @Path("/tea")
 public class TeaResource {
 
-    @Inject
-    Brewery brewery;
+//    @Inject
+//    Brewery brewery;
 
-    @RestClient
-    PaymentService paymentService;
+//    @RestClient
+//    PaymentService paymentService;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -23,25 +23,25 @@ public class TeaResource {
 
         String name = kind.toLowerCase(Locale.ROOT);
 
-        Tea tea = Tea.findByName(name);
-        if (tea == null) {
-            throw new NotFoundException("No such tea " + kind);
-        }
+//        Tea tea = Tea.findByName(name);
+//        if (tea == null) {
+//            throw new NotFoundException("No such tea " + kind);
+//        }
 
-        boolean paid = checkPayment(kind);
-        if (!paid) {
-            throw new NotPaidException(kind);
-        }
+//        boolean paid = checkPayment(kind);
+//        if (!paid) {
+//            throw new NotPaidException(kind);
+//        }
 
 
-        brewery.brewTea(kind);
+//        brewery.brewTea(kind);
 
         return "Here is your " + kind + " tea - enjoy!";
     }
 
-    private boolean checkPayment(String kind) {
-        return Boolean.parseBoolean(paymentService.isPaid(kind));
-    }
+//    private boolean checkPayment(String kind) {
+//        return Boolean.parseBoolean(paymentService.isPaid(kind));
+//    }
 
 
 }
