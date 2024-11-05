@@ -1,0 +1,11 @@
+requests~=2.32.2
+opentelemetry-distro
+# opentelemetry-sdk = '1.27.0'
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation-requests
+opentelemetry-instrumentation-kafka-python
+opentelemetry-instrumentation-psycopg2
+kafka-python
+psycopg2
+
+# opentelemetry-bootstrap
