@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Replicator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css"/>
+    <!-- Load AngularJS -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module("Replicator", []);
+
+        //Controller Part
+        app.controller("ReplicatorController", function ($scope, $http) {
+
+          //Initialize page with default data which is blank in this example
+          $scope.fruits = [];
+
+          $scope.form = {
+            name: "",
+            result: ""
+          };
+
+
+          //HTTP POST methods for add fruits
+          $scope.add = function () {
+            var data = { "kind": $scope.form.name };
+
+            $scope.form.result = "...replicating ...";
+
+            $http({
+              method: "GET",
+              url: '/tea',
+              params: data,
+              headers: {
+                //'Content-Type': 'application/json'
+              }
+            }).then(_success, _error);
+          };
+
+
+
+          function _success(response) {
+            // _refreshPageData();
+
+            $scope.form.result = response.data;
+
+            _clearForm();
+          }
+
+          function _error(response) {
+            switch(response.status) {
+                case 404:
+                  $scope.form.result = "No such tea known - please chose a different one"
+                  break;
+                case 402:
+                  $scope.form.result = "Sorry, you did not pay the gravity bill!"
+                  break;
+                default:
+                  $scope.form.result = response.data || response.statusText;
+            }
+          }
+
+          //Clear the form
+          function _clearForm() {
+            $scope.form.name = "";
+            $scope.form.description = "";
+          }
+        });
+    </script>
+</head>
+<body ng-app="Replicator" ng-controller="ReplicatorController">
+
+<div class="container">
+    <h1>Replicator</h1>
+
+    <h3>What Tea do you want?</h3>
+    <form ng-submit="add()">
+        <div class="row">
+            <div class="col-6">
+                <input type="text" placeholder="Name" ng-model="form.name" size="60"
+                       style="font-size:100%"/>
+            </div>
+        </div>
+        <input type="submit" value="Make it so!"/>
+    </form>
+
+    <h3>{{form.result}}</h3>
+
+</div>
+
+</body>
+</html>

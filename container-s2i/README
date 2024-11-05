@@ -1,0 +1,6 @@
+S2I build scripts for container images
+
+For Postgres:
+
+  cd postgres
+  s2i build . quay.io/fedora/postgresql-16 quay.io/pilhuhn/replicator-psql

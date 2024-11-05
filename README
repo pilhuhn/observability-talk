@@ -1,0 +1,7 @@
+Files for an Observability Workshop
+
+* compose.yaml: podman-compose file
+* container-s2i: source to build the postgres db container image via s2i
+* python-other: build of a most simple python http server image
+* python-pay: code of the 'payment' application
+* quarkus-replicator: code of the 'replicator' application

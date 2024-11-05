@@ -1,0 +1,64 @@
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - 16686:16686
+      - 4317:4317
+      - 4318:4318
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    network:
+      - replicator_net
+  
+  postgres:
+    image: quay.io/pilhuhn/replicator-psql
+    ports: 
+      - 5432:5432
+    environment:
+      - POSTGRESQL_ADMIN_PASSWORD=lala
+      - POSTGRESQL_USER=user
+      - POSTGRESQL_PASSWORD=pass
+      - POSTGRESQL_DATABASE=db=replicator
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    network:
+      - replicator_net
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 15s
+      timeout: 7s
+      retries: 5
+
+  kafka:
+    image: docker.io/apache/kafka-native:3.8.1
+    ports: 9092:9092
+    network:
+      - replicator_net
+
+#  replicator:
+#    image: quarkus/replicator-jvm
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    ports: 
+#      - 8080:8080
+#    network:
+#      - replicator_net
+#    environment:
+#      - pg.host=postgres
+#      - otel.host=jaeger
+#      - payment.hostport=localhost:8787
+
+
+  python-other:
+    image: quay.io/pilhuhn/py-simple-http
+    ports:
+      - 8000:8000
+    network:
+      - replicator_net
+   
+
+volumes:
+  db-data:
+  
+  
