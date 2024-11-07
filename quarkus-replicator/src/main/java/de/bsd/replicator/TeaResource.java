@@ -1,9 +1,9 @@
 package de.bsd.replicator;
 
+import de.bsd.loggerService.LoggerService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.Locale;
 
@@ -15,6 +15,9 @@ public class TeaResource {
 
 //    @RestClient
 //    PaymentService paymentService;
+
+//    @Inject
+//    LoggerService loggerService;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -29,6 +32,9 @@ public class TeaResource {
 //        }
 
 //        boolean paid = checkPayment(kind);
+
+//        loggerService.sendLog(kind, paid);
+
 //        if (!paid) {
 //            throw new NotPaidException(kind);
 //        }
