@@ -1,13 +1,12 @@
+import argparse
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-# from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (BatchSpanProcessor, ConsoleSpanExporter)
 from opentelemetry.trace import NonRecordingSpan, SpanContext, TraceFlags
-from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
 from opentelemetry.trace.status import StatusCode
@@ -90,24 +89,27 @@ class MyRequestHandler(BaseHTTPRequestHandler):
                 self.send_error(500, 'Just a random failure')
                 return
 
-            r = requests.get('http://localhost:8000')
+            r = requests.get('http://' + args.other_hostport)
             print(r.status_code)
 
-            self.send_response(200)
             # simulate a slowness every one and then
             if random.randint(0, 10) > 5:
                 time.sleep(1.5)
-
-            self.send_header("Content-Type", "text/plain")
-            self.end_headers()
 
             # We get a request like 'GET /payment?tea=sencha HTTP/1.1', let's parse it down
             req = self.requestline
             if not '?' in req:
                 span.set_attribute('request_line', req)
-                span.set_status(StatusCode.ERROR, 'Bad reequest line')
-                self.send_error(400, 'Bad request format')
+                self.send_response(400)
+                self.end_headers()
+                # This must come after sending the headers
+                span.set_status(StatusCode.ERROR, 'Bad request line')
                 return
+
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+
             req = req.split('?')[1]
             req = req.split(' ')[0]
             req = req.split('=')[1]
@@ -123,11 +125,21 @@ class MyRequestHandler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
 
+
     logging.basicConfig(level=logging.INFO)
     random.seed(time.time_ns())
 
-    RequestsInstrumentor().instrument()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-pg_host', default='localhost')
+    parser.add_argument('-otel_host', default='localhost')
+    parser.add_argument('-other_hostport', default='localhost:8000')
 
+    args = parser.parse_args()
+
+    logging.info("pg.host: %s, otel.host: %s, other.hostport: %s",
+                 args.pg_host, args.otel_host, args.other_hostport )
+
+    RequestsInstrumentor().instrument()
     Psycopg2Instrumentor().instrument(enable_commenter=True, commenter_options={})
 
     # Set up exporting
@@ -139,7 +151,7 @@ if __name__ == "__main__":
     provider = TracerProvider(resource=resource)
     # We need to provide the /v1/traces part when we use the http-exporter on port 4318
     # For the grpc endpoint on port 4317, this is not needed.
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4317"))
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://" + args.otel_host + ":4317"))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
@@ -148,11 +160,11 @@ if __name__ == "__main__":
     connection = psycopg2.connect(database="replicator",
                                   user="demo",
                                   password="lala7",
-                                  host="172.31.7.160", # TODO get from env
+                                  host=args.pg_host,
                                   port=5432)
 
 
-    server = HTTPServer(("localhost", 8787), MyRequestHandler)
+    server = HTTPServer(('', 8787), MyRequestHandler)
     print("Server started on port 8787")
     try:
         server.serve_forever()

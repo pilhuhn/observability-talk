@@ -2,21 +2,42 @@
 
 This is a sample project to illustrate some aspects of using https://opentelemetry.io/docs/instrumentation/python/[OpenTelemetry in Python].
 
-This is basically the source code of my "Distributed Tracing with Quarkus, Python, Open Telemetry and Jaeger" series of articles.
+server-minimal.py is the basic code for a http server, which is then in turn instrumented.
 
-server-minimal.py is the code from https://medium.com/@pilhuhn/distributed-tracing-with-quarkus-python-open-telemetry-and-jaeger-part-1-2d83f761b786
+server5.py is the full code after all instrumentation.
 
-server.py is the full code of both parts
-
-kaf-relay.py is the code for the third part of the series
+kaf-relay.py is the code for some Kafka related instrumentation
 
 == Posts
 
-https://itnext.io/distributed-tracing-with-quarkus-python-open-telemetry-and-jaeger-part-1-2d83f761b786[Part 1],
-https://itnext.io/distributed-tracing-with-quarkus-python-open-telemetry-and-jaeger-part-2-d533e3a83703[Part 2]
+See also https://pilhuhn.homeip.net/docs/distributed-tracing-quarkus/
 
 
 ## Install Python
 
-python3 -m venv
-source bin/activate
+[shell]
+----
+python3 -m venv ./venv
+source venv/bin/activate
+pip install -r requirements.txt
+----
+
+## Run full code
+
+[shell]
+----
+python server5.py \
+   -pg.host=localhost \
+   -otel_host=localhost \
+   -other_hostport=localhost:8000
+----
+
+## Container
+
+[shell]
+----
+podman run -pg_host=1.2.3.4 \
+           -otel_host=1.2.3.4 \
+           -other_hostport=localhost:8000 \
+           quay.io/pilhuhn/python-pay
+----

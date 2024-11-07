@@ -2,19 +2,15 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-# from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (BatchSpanProcessor, ConsoleSpanExporter)
 from opentelemetry.trace import NonRecordingSpan, SpanContext, TraceFlags
-from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
 
 import logging
 import psycopg2
 import random
-import requests
 import re
 import time
 
@@ -52,10 +48,10 @@ def extract_trace_data(parent_data):
     if not match:
         return None
 
-    version: str = match.group(1)
+    _version: str = match.group(1)
     trace_id: str = match.group(2)
     span_id: str = match.group(3)
-    trace_flags: str = match.group(4)
+    _trace_flags: str = match.group(4)
 
     span_context = SpanContext(
         trace_id=int(trace_id, 16),
@@ -100,7 +96,6 @@ class MyRequestHandler(BaseHTTPRequestHandler):
             req = req.split('=')[1]
             req = req.replace('+', ' ')
 
-
             is_paid = get_payment(req)
 
             self.wfile.write(bytes(str(is_paid).lower(), "utf-8"))
@@ -123,7 +118,7 @@ if __name__ == "__main__":
     provider = TracerProvider(resource=resource)
     # We need to provide the /v1/traces part when we use the http-exporter on port 4318
     # For the grpc endpoint on port 4317, this is not needed.
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4317"))
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://" +'localhost' + ":4317"))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
@@ -132,7 +127,7 @@ if __name__ == "__main__":
     connection = psycopg2.connect(database="replicator",
                                   user="demo",
                                   password="lala7",
-                                  host="172.31.7.160", # TODO get from env
+                                  host='localhost',
                                   port=5432)
 
 

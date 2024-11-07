@@ -35,19 +35,32 @@ services:
     network:
       - replicator_net
 
-#  replicator:
-#    image: quarkus/replicator-jvm
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#    ports: 
-#      - 8080:8080
-#    network:
-#      - replicator_net
-#    environment:
-#      - pg.host=postgres
-#      - otel.host=jaeger
-#      - payment.hostport=localhost:8787
+  replicator:
+    image: quarkus/replicator-jvm
+    profiles: ['dont_auto_start']
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports: 
+      - 8080:8080
+    network:
+      - replicator_net
+    environment:
+      - pg.host=postgres
+      - otel.host=jaeger
+      - payment.hostport=python-pay:8787
+
+  python-pay:
+    image: quay.io/pilhuhn/python-pay
+    profiles: ['dont_auto_start']
+    ports:
+      - 8787:8787
+    network:
+      - replicator_net
+    environment:
+      - pg_host=postgres
+      - otel_host=jaeger 
+      - other_hostport=python-other:8000
 
 
   python-other:
