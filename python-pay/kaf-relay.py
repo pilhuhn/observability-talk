@@ -1,3 +1,5 @@
+import argparse
+from ensurepip import bootstrap
 
 from kafka import KafkaConsumer, KafkaProducer
 from kafka.consumer.fetcher import ConsumerRecord
@@ -31,10 +33,10 @@ def extract_trace_data(parent_data):
     if not match:
         return None
 
-    version: str = match.group(1)
+    _version: str = match.group(1)
     trace_id: str = match.group(2)
     span_id: str = match.group(3)
-    trace_flags: str = match.group(4)
+    _trace_flags: str = match.group(4)
 
     span_context = SpanContext(
         trace_id=int(trace_id, 16),
@@ -66,6 +68,11 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     random.seed(time.time_ns())
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-otel_host', default='localhost')
+
+    args = parser.parse_args()
+
     from opentelemetry.instrumentation.kafka import KafkaInstrumentor
     KafkaInstrumentor().instrument()
 
@@ -77,12 +84,13 @@ if __name__ == "__main__":
     provider = TracerProvider(resource=resource)
     # We need to provide the /v1/traces part when we use the http-exporter on port 4318
     # For the grpc endpoint on port 4317, this is not needed.
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4317"))
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://" + args.otel_host + ":4317"))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
     tracer = trace.get_tracer('kaf-relay')
 
+    # this uses kafka at localhost:9092
     consumer = KafkaConsumer('topic1')
     producer = KafkaProducer()
 
@@ -103,7 +111,7 @@ if __name__ == "__main__":
         # Use this SpanContext as parent
         ctx = trace.set_span_in_context(NonRecordingSpan(span_context))
 
-        with tracer.start_as_current_span("do-the-work-span", context=ctx) as span:
+        with tracer.start_as_current_span("kafka-work-span", context=ctx) as span:
             # do the work
             body = msg.value.decode('utf-8')
             body = body + '  from Python'
