@@ -21,14 +21,14 @@ Use the provided src/main/docker/Dockerfile.jvm to build a version in container
 
 ```shell script
 ./mvnw package -DskipTests
-podman build -f src/main/docker/Dockerfile.jvm -t quarkus/replicator-jvm .
+podman build -f src/main/docker/Dockerfile.jvm -t quay.io/pilhuhn/quarkus-replicator .
 ```
 
 Then run it:
 
 ```shell script
 
-podman run -i --rm -p 8080:8080 -e pg.host=10.200.209.40 -e otel.host=10.200.209.40 quarkus/replicator-jvm
+podman run -i --rm -p 8080:8080 -e pg.host=10.200.209.40 -e otel.host=10.200.209.40 quay.io/pilhuhn/quarkus-replicator
 ```
 
 There are 3 env vars to set (they all default to localhost):
