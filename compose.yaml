@@ -12,7 +12,7 @@ services:
 
   postgres:
     image: quay.io/pilhuhn/replicator-psql:multi
-    ports: 
+    ports:
       - 5432:5432
     environment:
       - POSTGRESQL_ADMIN_PASSWORD=lala
@@ -31,19 +31,13 @@ services:
 
   kafka:
     image: docker.io/apache/kafka-native:3.9.0
-    ports: 
+    ports:
       - 9092:9092
     network:
       - replicator_net
 
-  python-other:
-    image: quay.io/pilhuhn/py-simple-http:multi
-    ports:
-      - 8000:8000
-    network:
-      - replicator_net
 
-#### 
+####
 #
 #  Only for reference
 #   Images won't be started at compose up because of the profile
