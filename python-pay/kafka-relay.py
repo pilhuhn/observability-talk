@@ -119,6 +119,9 @@ if __name__ == "__main__":
             # do the work
             body = msg.value.decode('utf-8')
             body = body + '  from Python'
+            # delay a bit
+            time.sleep(1)
+
             # and send it off to topic2
             producer.send('topic2', body.encode('utf-8'))
 
