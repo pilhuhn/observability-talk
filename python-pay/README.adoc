@@ -1,4 +1,4 @@
-= README
+# README
 
 This is a sample project to illustrate some aspects of using https://opentelemetry.io/docs/instrumentation/python/[OpenTelemetry in Python].
 
@@ -8,7 +8,7 @@ server5.py is the full code after all instrumentation.
 
 kaf-relay.py is the code for some Kafka related instrumentation
 
-== Posts
+## Posts
 
 See also https://pilhuhn.homeip.net/docs/distributed-tracing-quarkus/
 
@@ -32,12 +32,39 @@ python server5.py \
    -other_hostport=localhost:8000
 ----
 
-## Container
+## Python-pay in Container
+
+### Build
 
 [shell]
 ----
-podman run -pg_host=1.2.3.4 \
-           -otel_host=1.2.3.4 \
-           -other_hostport=localhost:8000 \
+podman build .  -t quay.io/pilhuhn/python-pay
+----
+
+### Run
+
+[shell]
+----
+podman run -e pg_host=1.2.3.4 \
+           -e otel_host=1.2.3.4 \
+           -e other_hostport=localhost:8000 \
            quay.io/pilhuhn/python-pay
+----
+
+## Kafka-Relay
+
+Simple server, listening for events on Kafka 'topic1' and
+replying on 'topic2'
+
+[shell]
+----
+python kafka-relay.py -kafka_host=1.2.3.4 \
+                    -otel_host=1.2.3.4
+----
+
+or just:
+
+[shell]
+----
+python kafka-relay.py
 ----

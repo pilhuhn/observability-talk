@@ -70,8 +70,12 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-otel_host', default='localhost')
+    parser.add_argument('-kafka_host', default='localhost')
 
     args = parser.parse_args()
+
+    logging.info("kafka_host: %s, otel_host: %s",
+                 args.kafka_host, args.otel_host)
 
     from opentelemetry.instrumentation.kafka import KafkaInstrumentor
     KafkaInstrumentor().instrument()
@@ -88,11 +92,11 @@ if __name__ == "__main__":
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
-    tracer = trace.get_tracer('kaf-relay')
+    tracer = trace.get_tracer('kafka-relay')
 
     # this uses kafka at localhost:9092
-    consumer = KafkaConsumer('topic1')
-    producer = KafkaProducer()
+    consumer = KafkaConsumer('topic1', bootstrap_servers=args.kafka_host)
+    producer = KafkaProducer(bootstrap_servers=args.kafka_host)
 
     # Loop over incoming messages, process then and
     # forward to topic2
