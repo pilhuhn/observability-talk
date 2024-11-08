@@ -20,7 +20,7 @@ services:
       - POSTGRESQL_PASSWORD=pass
       - POSTGRESQL_DATABASE=db=replicator
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/pgsql/data
     network:
       - replicator_net
     healthcheck:
@@ -34,13 +34,20 @@ services:
     ports: 9092:9092
     network:
       - replicator_net
+    hostname: kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT_HOST://kafka:9092,PLAINTEXT://localhost:19092'
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_LISTENERS: 'CONTROLLER://:29093,PLAINTEXT_HOST://:9092,PLAINTEXT://:19092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
 
   replicator:
-    image: quarkus/replicator-jvm
+    image: quay.io/pilhuhn/quarkus-replicator
     profiles: ['dont_auto_start']
-    depends_on:
-      postgres:
-        condition: service_healthy
     ports: 
       - 8080:8080
     network:
@@ -49,6 +56,17 @@ services:
       - pg.host=postgres
       - otel.host=jaeger
       - payment.hostport=python-pay:8787
+      - kafka.host=kafka
+
+  kafka-relay:
+    image: quay.io/pilhuhn/kafka-relay
+    profiles: ['dont_auto_start']
+    network:
+      - replicator_net
+    environment:
+      - kafka_host=kafka
+      - otel_host=jaeger 
+   
 
   python-pay:
     image: quay.io/pilhuhn/python-pay
