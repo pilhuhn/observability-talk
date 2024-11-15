@@ -68,3 +68,12 @@ or just:
 ----
 python kafka-relay.py
 ----
+
+### Podman bauen
+
+[shell]
+----
+podman manifest create quay.io/pilhuhn/kafka-relay:multi
+podman build -f Dockerfile-kafka --platform linux/amd64,linux/arm64 --manifest quay.io/pilhuhn/kafka-relay:multi .
+podman manifest push quay.io/pilhuhn/kafka-relay:multi
+----
