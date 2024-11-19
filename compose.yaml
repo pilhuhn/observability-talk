@@ -7,12 +7,12 @@ services:
       - 4318:4318
     environment:
       COLLECTOR_OTLP_ENABLED: true
-    network:
-      - replicator_net
-  
+#    network:
+#      - replicator_net
+
   postgres:
     image: quay.io/pilhuhn/replicator-psql
-    ports: 
+    ports:
       - 5432:5432
     environment:
       - POSTGRESQL_ADMIN_PASSWORD=lala
@@ -21,8 +21,8 @@ services:
       - POSTGRESQL_DATABASE=db=replicator
     volumes:
       - db-data:/var/lib/pgsql/data
-    network:
-      - replicator_net
+#    network:
+#      - replicator_net
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 15s
@@ -31,9 +31,10 @@ services:
 
   kafka:
     image: docker.io/apache/kafka-native:3.8.1
-    ports: 9092:9092
-    network:
-      - replicator_net
+    ports:
+      - 9092:9092
+#    network:
+#      - replicator_net
     hostname: kafka
     environment:
       KAFKA_NODE_ID: 1
@@ -46,12 +47,12 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
 
   replicator:
-    image: quay.io/pilhuhn/quarkus-replicator
+    image: quay.io/pilhuhn/quarkus-replicator:full-no-kafka
     profiles: ['dont_auto_start']
-    ports: 
+    ports:
       - 8080:8080
-    network:
-      - replicator_net
+#    network:
+#      - replicator_net
     environment:
       - pg.host=postgres
       - otel.host=jaeger
@@ -61,23 +62,23 @@ services:
   kafka-relay:
     image: quay.io/pilhuhn/kafka-relay
     profiles: ['dont_auto_start']
-    network:
-      - replicator_net
+ #   network:
+ #     - replicator_net
     environment:
       - kafka_host=kafka
-      - otel_host=jaeger 
-   
+      - otel_host=jaeger
+
 
   python-pay:
     image: quay.io/pilhuhn/python-pay
     profiles: ['dont_auto_start']
     ports:
       - 8787:8787
-    network:
-      - replicator_net
+#    network:
+#      - replicator_net
     environment:
       - pg_host=postgres
-      - otel_host=jaeger 
+      - otel_host=jaeger
       - other_hostport=python-other:8000
 
 
@@ -85,11 +86,11 @@ services:
     image: quay.io/pilhuhn/py-simple-http
     ports:
       - 8000:8000
-    network:
-      - replicator_net
-   
+#    network:
+#      - replicator_net
+
 
 volumes:
   db-data:
-  
-  
+
+

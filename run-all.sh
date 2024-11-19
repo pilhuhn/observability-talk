@@ -1,7 +1,7 @@
 #!/bin/sh
 set -x
 
-git checkout -b fully-working
+git checkout  fully-working
 
 podman-compose up  -d
 
