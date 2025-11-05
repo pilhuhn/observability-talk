@@ -7,6 +7,8 @@
 
     <properties>
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -15,6 +17,8 @@
         <quarkus.platform.version>3.29.0</quarkus.platform.version>
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.3.1</surefire-plugin.version>
+        <jacoco.agent.argLine></jacoco.agent.argLine>
+        <surefire.argLine.additional></surefire.argLine.additional>
     </properties>
 
     <dependencyManagement>
@@ -112,6 +116,11 @@
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
+                    <!-- the add-opens java.naming/com.sun.naming.internal is here to allow to clear
+                                                 the propertiesCache in com.sun.naming.internal.ResourceManager -->
+                                            <!-- the add-opens java.base/java.lang=ALL-UNNAMED is here for
+                                                 org.jboss.JDKSpecific.ThreadAccess.clearThreadLocals() -->
+                    <argLine>${jacoco.agent.argLine} -Xmx1500m -XX:MaxMetaspaceSize=1500m -Djava.io.tmpdir="${project.build.directory}" ${surefire.argLine.additional} --add-opens java.naming/com.sun.naming.internal=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <plugin>
