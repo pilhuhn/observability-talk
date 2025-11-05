@@ -53,6 +53,7 @@ class MyRequestHandler(BaseHTTPRequestHandler):
         inc_trace = self.headers["traceparent"]
         ctx = {}
         span_context = None
+#        inc_trace = None # TODO remove me !!
         if inc_trace is not None:
             print(inc_trace)
             span_context = extract_trace_data(inc_trace)

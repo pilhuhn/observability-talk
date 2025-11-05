@@ -16,6 +16,7 @@
  */
 package de.bsd.replicator;
 
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.SpanAttribute;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -29,6 +30,7 @@ public class Brewery {
     @WithSpan()
     void brewTea(@SpanAttribute(value = "kind-of-tea") String kind) throws InterruptedException {
         if (Math.random()*100 < 30) {
+            Span.current().setAttribute("dilithium", "false");
             throw new NotEnoughDilithiumException(kind);
         }
 

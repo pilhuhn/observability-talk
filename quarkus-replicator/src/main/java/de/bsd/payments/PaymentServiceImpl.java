@@ -16,6 +16,7 @@
  */
 package de.bsd.payments;
 
+import io.opentelemetry.api.trace.Span;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -32,9 +33,10 @@ public class PaymentServiceImpl {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public boolean isPaid(@QueryParam("tea") String kind) {
-        if (kind.contains(" ")) {
-            return false;
-        }
-        return true;
+        Span span = Span.current();
+        span.setAttribute("payment.kind", kind);
+        boolean hasSpace = kind.contains(" ");
+        span.setAttribute("payment.isPaid", !hasSpace);
+        return !hasSpace;
     }
 }

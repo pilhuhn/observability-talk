@@ -11,8 +11,8 @@ services:
 #      - replicator_net
 
   postgres:
-    image: quay.io/pilhuhn/replicator-psql
-    ports:
+    image: quay.io/pilhuhn/replicator-psql:multi
+    ports: 
       - 5432:5432
     environment:
       - POSTGRESQL_ADMIN_PASSWORD=lala
@@ -20,9 +20,9 @@ services:
       - POSTGRESQL_PASSWORD=pass
       - POSTGRESQL_DATABASE=db=replicator
     volumes:
-      - db-data:/var/lib/pgsql/data
-#    network:
-#      - replicator_net
+      - db-data:/var/lib/postgresql/data
+    network:
+      - replicator_net
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 15s
@@ -30,21 +30,24 @@ services:
       retries: 5
 
   kafka:
-    image: docker.io/apache/kafka-native:3.8.1
-    ports:
+    image: docker.io/apache/kafka-native:3.9.0
+    ports: 
       - 9092:9092
-#    network:
-#      - replicator_net
-    hostname: kafka
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT_HOST://kafka:9092,PLAINTEXT://localhost:19092'
-      KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
-      KAFKA_LISTENERS: 'CONTROLLER://:29093,PLAINTEXT_HOST://:9092,PLAINTEXT://:19092'
-      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
-      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+    network:
+      - replicator_net
+
+  python-other:
+    image: quay.io/pilhuhn/py-simple-http:multi
+    ports:
+      - 8000:8000
+    network:
+      - replicator_net
+
+#### 
+#
+#  Only for reference
+#   Images won't be started at compose up because of the profile
+#
 
   replicator:
     image: quay.io/pilhuhn/quarkus-replicator:full-no-kafka
@@ -70,7 +73,7 @@ services:
 
 
   python-pay:
-    image: quay.io/pilhuhn/python-pay
+    image: quay.io/pilhuhn/python-pay:multi
     profiles: ['dont_auto_start']
     ports:
       - 8787:8787

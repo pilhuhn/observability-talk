@@ -1,0 +1,6 @@
+FROM quay.io/fedora/postgresql-16
+ADD postgresql-init /opt/app-root/src/postgresql-init/
+
+###### Below would be the image from DockerHub, which is multiarch
+#FROM docker.io/postgres:17
+#ADD postgresql-init /docker-entrypoint-initdb.d/

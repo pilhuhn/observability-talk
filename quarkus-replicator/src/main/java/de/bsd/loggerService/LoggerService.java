@@ -22,6 +22,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 /**
+ * We do some remote logging here.
  * @author hrupp
  */
 
