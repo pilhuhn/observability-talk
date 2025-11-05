@@ -12,6 +12,8 @@ class TeaResourceTest {
     void testHelloEndpoint() {
         given()
           .when().get("/tea?kind=sencha")
+                .then()
+                .statusCode(200)
           ;
     }
 
@@ -19,6 +21,8 @@ class TeaResourceTest {
     void testForSpace() {
         given()
                 .when().get("/tea?kind=earl%20grey")
+                .then()
+                .statusCode(200)
                 ;
     }
 }
