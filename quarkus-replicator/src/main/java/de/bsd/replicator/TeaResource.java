@@ -30,6 +30,7 @@ public class TeaResource {
         }
 
         String name = kind.toLowerCase(Locale.ROOT);
+        name = name.replaceAll("%20"," ");
 
         Tea tea = Tea.findByName(name);
         if (tea == null) {
@@ -38,7 +39,7 @@ public class TeaResource {
 
         boolean paid = false;
         try {
-            paid = checkPayment(kind);
+            paid = checkPayment(name);
         } catch (Exception e) {
             System.err.println("Is the payment service configured?  -> " + e.getMessage());
         }

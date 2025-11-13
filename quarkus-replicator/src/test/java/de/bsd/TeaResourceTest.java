@@ -18,11 +18,20 @@ class TeaResourceTest {
     }
 
     @Test
-    void testForSpace() {
+    void testForAmpSpace() {
         given()
                 .when().get("/tea?kind=earl%20grey")
                 .then()
-                .statusCode(404)
+                .statusCode(402)
+                ;
+    }
+
+    @Test
+    void testForSpace() {
+        given()
+                .when().get("/tea?kind=earl grey")
+                .then()
+                .statusCode(402)
                 ;
     }
 

@@ -20,6 +20,8 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.SpanAttribute;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  * @author hrupp
@@ -27,9 +29,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class Brewery {
 
+    @Inject
+    @ConfigProperty(defaultValue = "false")
+    Boolean isTesting ;
+
     @WithSpan()
     void brewTea(@SpanAttribute(value = "kind-of-tea") String kind) throws InterruptedException {
-        if (Math.random()*100 < 30) {
+        if (!isTesting && Math.random()*100 < 30) {
             Span.current().setAttribute("dilithium", "false");
             throw new NotEnoughDilithiumException(kind);
         }
