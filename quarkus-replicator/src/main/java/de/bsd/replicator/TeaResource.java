@@ -25,6 +25,10 @@ public class TeaResource {
     public String makeTea(@QueryParam("kind") String kind) throws Exception {
 
 
+        if (kind==null) {
+            throw new IllegalArgumentException("No request passed - how am I supposed to work under these conditions?");
+        }
+
         String name = kind.toLowerCase(Locale.ROOT);
 
         Tea tea = Tea.findByName(name);
@@ -32,7 +36,12 @@ public class TeaResource {
             throw new NotFoundException("No such tea " + kind);
         }
 
-        boolean paid = checkPayment(kind);
+        boolean paid = false;
+        try {
+            paid = checkPayment(kind);
+        } catch (Exception e) {
+            System.err.println("Is the payment service configured?  -> " + e.getMessage());
+        }
 
         loggerService.sendLog(kind, paid);
 

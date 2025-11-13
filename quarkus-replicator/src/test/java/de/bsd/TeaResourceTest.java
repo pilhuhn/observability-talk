@@ -22,7 +22,16 @@ class TeaResourceTest {
         given()
                 .when().get("/tea?kind=earl%20grey")
                 .then()
-                .statusCode(200)
+                .statusCode(404)
                 ;
     }
+
+    @Test
+    void testForNoInput() {
+         given()
+                 .when().get("/tea?kind=")
+                 .then()
+                 .statusCode(500)
+                 ;
+     }
 }
