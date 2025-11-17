@@ -50,7 +50,7 @@
           function _error(response) {
             switch(response.status) {
                 case 404:
-                  $scope.form.result = "No such tea known - please chose a different one"
+                  $scope.form.result = "We don't serve that tea - please chose a different one"
                   break;
                 case 402:
                   $scope.form.result = "Sorry, you did not pay the gravity bill!"
