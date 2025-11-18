@@ -11,7 +11,7 @@ services:
 #      - replicator_net
 
   postgres:
-    image: quay.io/pilhuhn/replicator-psql
+    image: quay.io/pilhuhn/replicator-psql:multi
     ports:
       - 5432:5432
     environment:
@@ -60,7 +60,7 @@ services:
       - kafka.host=kafka
 
   kafka-relay:
-    image: quay.io/pilhuhn/kafka-relay
+    image: quay.io/pilhuhn/kafka-relay:multi
     profiles: ['dont_auto_start']
  #   network:
  #     - replicator_net
@@ -70,7 +70,7 @@ services:
 
 
   python-pay:
-    image: quay.io/pilhuhn/python-pay
+    image: quay.io/pilhuhn/python-pay:multi
     profiles: ['dont_auto_start']
     ports:
       - 8787:8787
@@ -83,7 +83,7 @@ services:
 
 
   python-other:
-    image: quay.io/pilhuhn/py-simple-http
+    image: quay.io/pilhuhn/py-simple-http:multi
     ports:
       - 8000:8000
 #    network:
